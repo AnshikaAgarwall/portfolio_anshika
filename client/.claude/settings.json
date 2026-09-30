@@ -1,0 +1,11 @@
+{
+  "permissions": {
+    "allow": [
+      "PowerShell($s=\"C:\\\\Users\\\\anshi\\\\AppData\\\\Local\\\\Temp\\\\claude\\\\e--portfolio-client\\\\7f86164d-6efe-45c3-9bdd-22655438a04a\\\\scratchpad\"; Set-Location $s; npm init -y 2>&1 | Out-Null; npm install playwright-core 2>&1 | Select-Object -Last 2; \\(Invoke-WebRequest -UseBasicParsing http://localhost:5200/ -TimeoutSec 5\\).StatusCode)",
+      "PowerShell(npm run build 2>&1 | Select-String \"built in|error\"; Set-Location \"C:\\\\Users\\\\anshi\\\\AppData\\\\Local\\\\Temp\\\\claude\\\\e--portfolio-client\\\\7f86164d-6efe-45c3-9bdd-22655438a04a\\\\scratchpad\"; node shoot.mjs 2>&1 | ForEach-Object { \\($_ -split '\"btns\"'\\)[0] })",
+      "PowerShell(npx vite preview --port 5201 --strictPort)",
+      "PowerShell(npx vite preview --port 5202 --strictPort)",
+      "PowerShell(Remove-Item scripts\\\\generate-sitemap.mjs -Confirm:$false)"
+    ]
+  }
+}

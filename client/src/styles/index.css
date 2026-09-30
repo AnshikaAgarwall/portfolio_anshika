@@ -1,0 +1,153 @@
+/*
+  Global stylesheet: self-hosted fonts, Tailwind layers, base typography,
+  the skip link, focus-visible outlines, notch safe-areas, text wrapping and
+  prefers-reduced-motion handling.
+  All colours/sizes come from tailwind.config.js via @apply / theme().
+*/
+
+/* Self-hosted variable fonts (latin subset, one file each covers every weight).
+   Both are preloaded in index.html. */
+@font-face {
+  font-family: 'Inter';
+  src: url('/fonts/inter-var-latin.woff2') format('woff2');
+  font-weight: 100 900;
+  font-style: normal;
+  font-display: swap;
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329,
+    U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
+@font-face {
+  font-family: 'Inter Tight';
+  src: url('/fonts/inter-tight-var-latin.woff2') format('woff2');
+  font-weight: 100 900;
+  font-style: normal;
+  font-display: swap;
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329,
+    U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html {
+    @apply bg-light text-ink font-body antialiased;
+    text-rendering: optimizeLegibility;
+    scroll-behavior: smooth;
+  }
+
+  body {
+    @apply min-h-svh bg-light;
+    /* Long words and URLs wrap instead of widening the page. */
+    overflow-wrap: break-word;
+  }
+
+  /* Tables, code, links and definition values may break anywhere. */
+  pre,
+  code,
+  td,
+  th,
+  dd,
+  a[href^='mailto:'] {
+    overflow-wrap: anywhere;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    @apply font-heading font-medium;
+  }
+
+  ::selection {
+    @apply bg-ink text-paper;
+  }
+
+  /* Only keyboard focus gets an outline; mouse clicks stay clean. */
+  :focus {
+    outline: none;
+  }
+
+  :focus-visible {
+    @apply outline outline-focus outline-offset-focus outline-ink;
+  }
+
+  /* Dark sections (announcement bar, mobile menu, footer) carry .surface-dark
+     so focus outlines inside them flip to light and stay visible. */
+  .surface-dark :focus-visible {
+    @apply outline-paper;
+  }
+
+  /* <main> and page headings receive focus programmatically (skip link,
+     route changes); they are not controls, so no ring. */
+  main:focus-visible,
+  [tabindex='-1']:focus-visible {
+    outline: none;
+  }
+}
+
+@layer components {
+  /* Hidden off-screen until focused with the keyboard. */
+  .skip-link {
+    @apply fixed left-4 top-4 z-[100] -translate-y-[200%] bg-ink px-5 py-3
+      font-body text-label font-medium uppercase tracking-wide2 text-paper
+      transition-transform duration-200;
+  }
+
+  .skip-link:focus,
+  .skip-link:focus-visible {
+    @apply translate-y-0 outline-paper;
+  }
+
+  /* Soft blurred ellipse under the hero cutout. A radial gradient keeps it
+     elliptical without breaking the "radius 0 everywhere" rule. */
+  .ground-shadow {
+    background: radial-gradient(closest-side, theme('colors.ink / 28%'), transparent);
+    filter: blur(6px);
+  }
+
+  /* Small uppercase editorial label, e.g. "NEW COLLECTION". */
+  .label {
+    @apply font-body text-label font-medium uppercase tracking-wide3;
+  }
+}
+
+/* Notch / rounded-corner phones (viewport-fit=cover in index.html): every page
+   gutter uses px-6 (mobile) or md:px-10, so widening just those two classes
+   to at least the safe-area inset protects all content in one place.
+   Backgrounds still run edge to edge. */
+@supports (padding: max(0px)) {
+  .px-6 {
+    padding-left: max(1.5rem, env(safe-area-inset-left));
+    padding-right: max(1.5rem, env(safe-area-inset-right));
+  }
+  @media (min-width: 768px) {
+    .md\:px-10 {
+      padding-left: max(2.5rem, env(safe-area-inset-left));
+      padding-right: max(2.5rem, env(safe-area-inset-right));
+    }
+  }
+}
+
+/* Respect users who ask the OS for less motion: no smooth scrolling, no CSS
+   transitions/animations (incl. the skeleton pulse). Framer Motion is handled
+   via <MotionConfig reducedMotion="user"> plus useReducedMotion in FadeUp,
+   the Hero and the parallax hook. */
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
